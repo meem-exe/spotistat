@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Search – Spotistat{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+  <h2 class="fw-black mb-0">Track Search</h2>
+  <p class="text-muted small mb-0">
+    Search for a track by exact name using binary search (O(log n)).
+  </p>
+</div>
+
+<div class="card card-dark mb-4" style="max-width: 600px;">
+  <div class="card-body">
+    <form method="POST" class="d-flex gap-2">
+      <input
+        type="text"
+        name="track_name"
+        class="form-control form-control-dark"
+        placeholder="Enter exact track name e.g. Espresso"
+        value="{{ search_term }}"
+        required
+      >
+      <button type="submit" class="btn btn-spotify px-4">Search</button>
+    </form>
+    <p class="small text-muted mt-2 mb-0">
+      Search is case-sensitive. Enter the track name exactly as it appears in the dataset.
+    </p>
+  </div>
+</div>
+
+<!-- Result -->
+{% if result %}
+  <div class="card card-dark" style="max-width: 600px; border-color: #1DB954;">
+    <div class="card-body">
+      <h5 class="fw-bold text-green mb-1">{{ result.track_name }}</h5>
+      <p class="text-muted mb-3">{{ result.artist_name }} &mdash; {{ result.album_name }}</p>
+      <div class="row g-2">
+        <div class="col-6">
+          <div class="stat-card-sm">
+            <div class="stat-value-sm">{{ result.genre or 'Unknown' }}</div>
+            <div class="stat-label">Genre</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="stat-card-sm">
+            <div class="stat-value-sm">{{ (result.duration_ms | int // 1000) // 60 }}:{{ '%02d' % ((result.duration_ms | int // 1000) % 60) }}</div>
+            <div class="stat-label">Duration</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% elif not_found %}
+  <div class="card card-dark" style="max-width: 600px;">
+    <div class="card-body text-muted">
+      No track found matching <strong class="text-white">"{{ search_term }}"</strong>.
+      Check the spelling and capitalisation.
+    </div>
+  </div>
+{% endif %}
+
+<div class="mt-3">
+  <small class="text-muted">
+    Search algorithm: Binary search. The track list is sorted alphabetically first,
+    then the search range is halved on each step. Time complexity O(log n).
+  </small>
+</div>
+
+{% endblock %}

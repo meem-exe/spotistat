@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% block title %}Analytics – Spotistat{% endblock %}
+
+{% block content %}
+
+<!-- Page heading -->
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+  <div>
+    <h2 class="fw-black mb-0">
+      {{ display_name }}<span class="text-green">'s Stats</span>
+    </h2>
+    <p class="text-muted small mb-0">
+      {% if start_date and end_date %}
+        Showing data from {{ start_date }} to {{ end_date }}
+      {% else %}
+        Showing all-time data
+      {% endif %}
+    </p>
+  </div>
+</div>
+
+<!-- Date range filter form -->
+<div class="card card-dark mb-4">
+  <div class="card-body">
+    <h6 class="text-muted text-uppercase small mb-3 fw-semibold">Filter by date range</h6>
+    <form method="POST" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small text-muted">Start date</label>
+        <input type="date" name="start_date" class="form-control form-control-dark"
+               value="{{ start_date }}" max="{{ end_date if end_date else '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small text-muted">End date</label>
+        <input type="date" name="end_date" class="form-control form-control-dark"
+               value="{{ end_date }}" min="{{ start_date if start_date else '' }}">
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-spotify w-100">Apply</button>
+      </div>
+      <div class="col-md-2">
+        <a href="{{ url_for('analytics') }}" class="btn btn-outline-secondary w-100">Reset</a>
+      </div>
+    </form>
+
+    {% if error_msg %}
+      <div class="alert alert-danger mt-3 mb-0 py-2">{{ error_msg }}</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- No data message -->
+{% if not stats %}
+  <div class="text-center py-5 text-muted">
+    <p class="fs-5">No listening data found for this date range.</p>
+    <a href="{{ url_for('analytics') }}" class="btn btn-outline-secondary">Reset filter</a>
+  </div>
+
+{% else %}
+
+<!-- Stat cards row -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_plays }}</div>
+      <div class="stat-label">Total Plays</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_minutes }}</div>
+      <div class="stat-label">Minutes Listened</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.top_artists[0][0] if stats.top_artists else 'N/A' }}</div>
+      <div class="stat-label">Top Artist</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.top_tracks[0][0].split(' - ')[0] if stats.top_tracks else 'N/A' }}</div>
+      <div class="stat-label">Top Track</div>
+    </div>
+  </div>
+</div>
+
+<!-- Top artists + Top tracks lists -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card card-dark h-100">
+      <div class="card-body">
+        <h6 class="section-label">Top Artists</h6>
+        <ol class="ranked-list">
+          {% for artist, count in stats.top_artists %}
+            <li class="ranked-item">
+              <span class="ranked-name">{{ artist }}</span>
+              <span class="ranked-count">{{ count }} plays</span>
+            </li>
+          {% else %}
+            <li class="text-muted">No data</li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card card-dark h-100">
+      <div class="card-body">
+        <h6 class="section-label">Top Tracks</h6>
+        <ol class="ranked-list">
+          {% for track, count in stats.top_tracks %}
+            <li class="ranked-item">
+              <span class="ranked-name">{{ track }}</span>
+              <span class="ranked-count">{{ count }} plays</span>
+            </li>
+          {% else %}
+            <li class="text-muted">No data</li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts row -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card card-dark">
+      <div class="card-body">
+        <h6 class="section-label">Top Artists by Plays</h6>
+        <div class="chart-wrapper">
+          <canvas id="artistChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card card-dark">
+      <div class="card-body">
+        <h6 class="section-label">Top Tracks by Plays</h6>
+        <div class="chart-wrapper">
+          <canvas id="trackChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card card-dark">
+      <div class="card-body">
+        <h6 class="section-label">Genre Distribution</h6>
+        <div class="chart-wrapper">
+          <canvas id="genreChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card card-dark">
+      <div class="card-body">
+        <h6 class="section-label">Listening by Hour of Day</h6>
+        <div class="chart-wrapper">
+          <canvas id="hourChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endif %} {# end if stats #}
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+  // chart_data is a JSON string serialised by Flask using json.dumps()
+  const cd = {{ chart_data | safe }};
+
+  // Shared chart configuration defaults
+  Chart.defaults.color = '#aaaaaa';
+  Chart.defaults.font.family = 'Inter, sans-serif';
+
+  const GREEN   = '#1DB954';
+  const PURPLE  = '#7B5EA7';
+  const PINK    = '#E91E8C';
+  const ORANGE  = '#FF7043';
+  const BLUE    = '#29B6F6';
+  const YELLOW  = '#FFD600';
+  const TEAL    = '#26C6DA';
+  const RED     = '#EF5350';
+  const LIME    = '#9CCC65';
+
+  const GENRE_PALETTE = [GREEN, PURPLE, PINK, ORANGE, BLUE, YELLOW, TEAL, RED, LIME, '#78909C'];
+
+  // Bar chart defaults
+  function barOpts(labels, data, colour) {
+    return {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{ data: data, backgroundColor: colour, borderRadius: 6 }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: '#2a2a2a' }, ticks: { maxRotation: 30 } },
+          y: { grid: { color: '#2a2a2a' }, beginAtZero: true }
+        },
+        responsive: true, maintainAspectRatio: false
+      }
+    };
+  }
+
+  // Only render charts if we have data
+  if (cd && cd.artist_labels && cd.artist_labels.length > 0) {
+    new Chart(document.getElementById('artistChart'), barOpts(cd.artist_labels, cd.artist_counts, GREEN));
+    new Chart(document.getElementById('trackChart'),  barOpts(cd.track_labels,  cd.track_counts,  PURPLE));
+
+    new Chart(document.getElementById('genreChart'), {
+      type: 'doughnut',
+      data: {
+        labels: cd.genre_labels,
+        datasets: [{
+          data: cd.genre_counts,
+          backgroundColor: GENRE_PALETTE.slice(0, cd.genre_labels.length),
+          borderColor: '#1a1a1a',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { position: 'right', labels: { boxWidth: 14, padding: 12 } }
+        },
+        responsive: true, maintainAspectRatio: false
+      }
+    });
+
+    // Hour chart - all 24 hours on x axis
+    new Chart(document.getElementById('hourChart'), {
+      type: 'bar',
+      data: {
+        labels: cd.hour_labels.map(h => h + ':00'),
+        datasets: [{
+          data: cd.hour_counts,
+          backgroundColor: cd.hour_counts.map((_, i) => (i >= 18 || i <= 2) ? GREEN : BLUE),
+          borderRadius: 4
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: '#2a2a2a' } },
+          y: { grid: { color: '#2a2a2a' }, beginAtZero: true }
+        },
+        responsive: true, maintainAspectRatio: false
+      }
+    });
+  }
+</script>
+{% endblock %}

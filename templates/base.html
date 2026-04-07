@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Spotistat{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Navigation bar -->
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark-custom px-3">
+    <a class="navbar-brand d-flex align-items-center gap-2 fw-black" href="{{ url_for('analytics') }}">
+      <svg width="22" height="22" viewBox="0 0 60 60" fill="none">
+        <circle cx="30" cy="30" r="30" fill="#1DB954"/>
+        <path d="M15 22 Q30 14 45 22" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M18 30 Q30 23 42 30" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M21 38 Q30 33 39 38" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+      </svg>
+      Spotistat
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'analytics' %}active{% endif %}"
+             href="{{ url_for('analytics') }}">Analytics</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'leaderboard' %}active{% endif %}"
+             href="{{ url_for('leaderboard') }}">Leaderboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'search' %}active{% endif %}"
+             href="{{ url_for('search') }}">Search</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ms-auto d-flex align-items-center">
+        <li class="nav-item me-3">
+          <span class="text-muted small">Logged in as <span class="text-white">{{ session.get('display_name', '') }}</span></span>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('logout') }}">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page content -->
+  <main class="container-fluid px-4 py-4">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
