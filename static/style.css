@@ -1,0 +1,247 @@
+/* ── Spotistat – style.css ─────────────────────────────────────────────────
+   Dark theme using Spotify's colour palette.
+   Background: #121212  Surface: #1e1e1e  Accent: #1DB954 (Spotify green)
+   Font: Inter (loaded from Google Fonts in base.html)
+─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Base ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background-color: #121212;
+  color: #e0e0e0;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+}
+
+/* ── Colours ──────────────────────────────────────────────────────────── */
+.text-green  { color: #1DB954 !important; }
+.bg-dark-custom { background-color: #0d0d0d !important; }
+
+/* ── Navbar ───────────────────────────────────────────────────────────── */
+.navbar-brand {
+  font-weight: 900;
+  font-size: 1.15rem;
+  color: #ffffff !important;
+  letter-spacing: -0.3px;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: #aaaaaa;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active {
+  color: #ffffff;
+  background: rgba(255,255,255,0.06);
+}
+
+/* ── Login page ───────────────────────────────────────────────────────── */
+.login-body { background: #0d0d0d; }
+
+.login-card {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-card h1 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -1px;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.btn-spotify {
+  background-color: #1DB954;
+  border: none;
+  color: #000000;
+  font-weight: 700;
+  border-radius: 50px;
+  padding: 0.55rem 1.4rem;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-spotify:hover {
+  background-color: #1ed760;
+  color: #000000;
+  transform: translateY(-1px);
+}
+.btn-spotify:active { transform: translateY(0); }
+
+.btn-outline-secondary {
+  border-color: #444;
+  color: #aaa;
+  border-radius: 50px;
+}
+.btn-outline-secondary:hover {
+  background: #333;
+  color: #fff;
+  border-color: #555;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────── */
+.card-dark {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+}
+
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888888;
+  margin-bottom: 1rem;
+}
+
+/* ── Stat cards ───────────────────────────────────────────────────────── */
+.stat-card {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 1.2rem 1rem;
+  text-align: center;
+}
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #1DB954;
+  line-height: 1.1;
+  word-break: break-word;
+}
+.stat-label {
+  font-size: 0.72rem;
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.3rem;
+}
+
+/* Smaller variant for search result cards */
+.stat-card-sm {
+  background: #242424;
+  border-radius: 8px;
+  padding: 0.8rem;
+  text-align: center;
+}
+.stat-value-sm {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1DB954;
+}
+
+/* ── Ranked list (top artists / tracks) ──────────────────────────────── */
+.ranked-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: rank;
+}
+.ranked-item {
+  counter-increment: rank;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid #242424;
+  gap: 0.5rem;
+}
+.ranked-item:last-child { border-bottom: none; }
+.ranked-item::before {
+  content: counter(rank);
+  min-width: 24px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #555;
+}
+.ranked-name {
+  flex: 1;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ranked-count {
+  font-size: 0.75rem;
+  color: #888;
+  white-space: nowrap;
+}
+
+/* ── Chart wrapper ────────────────────────────────────────────────────── */
+.chart-wrapper {
+  position: relative;
+  height: 220px;
+}
+
+/* ── Form controls ────────────────────────────────────────────────────── */
+.form-control-dark {
+  background-color: #242424 !important;
+  border: 1px solid #333 !important;
+  color: #e0e0e0 !important;
+  border-radius: 8px;
+}
+.form-control-dark:focus {
+  background-color: #2a2a2a !important;
+  border-color: #1DB954 !important;
+  box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.15) !important;
+  color: #ffffff !important;
+}
+.form-control-dark::placeholder { color: #666 !important; }
+/* Date input colour fix for Chrome */
+.form-control-dark::-webkit-calendar-picker-indicator { filter: invert(0.6); }
+
+/* ── Leaderboard table ────────────────────────────────────────────────── */
+.table-dark-custom {
+  color: #e0e0e0;
+  border-color: #2a2a2a;
+}
+.table-dark-custom thead th {
+  background: #242424;
+  color: #888;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid #333;
+  padding: 0.75rem 1rem;
+}
+.table-dark-custom tbody tr {
+  border-bottom: 1px solid #242424;
+}
+.table-dark-custom tbody td {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+}
+.table-dark-custom tbody tr:hover { background: #242424; }
+
+.rank-gold   td { color: #FFD700; }
+.rank-silver td { color: #C0C0C0; }
+.rank-bronze td { color: #CD7F32; }
+
+/* ── Alert overrides ──────────────────────────────────────────────────── */
+.alert-danger {
+  background-color: #3a1a1a;
+  border-color: #7a2020;
+  color: #f88;
+  border-radius: 8px;
+}
+
+/* ── Responsive tweaks ────────────────────────────────────────────────── */
+@media (max-width: 576px) {
+  .stat-value { font-size: 1.1rem; }
+  .chart-wrapper { height: 180px; }
+}
+/* ── Improve text readability ───────────────────────────── */
+p, span, small, label {
+  color: #e6e6e6 !important;
+}
+
+.text-muted {
+  color: #b3b3b3 !important;
+}
